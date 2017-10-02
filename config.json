@@ -1,0 +1,19 @@
+{
+"vm": [
+  {
+      "name": "ctapi.domain.local",
+      "state": "started",
+      "memory": "1024",
+      "cpu": "1",
+      "autostart": "on",
+      "net": [
+            {
+                    "device": "net0",
+                    "ip": "10.200.109.158/24",
+                    "gateway": "10.200.109.1",
+                    "nameserver": "85.25.128.10,85.25.255.10"
+                  }
+          ]
+    }
+]
+}
