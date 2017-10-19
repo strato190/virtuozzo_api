@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-func Prlctl(args ...string) error {
+func Prlctl(args ...string) (string, error) {
 	var stdout, stderr bytes.Buffer
 	var prlctlPath string
 	if prlctlPath == "" {
 		var err error
 		prlctlPath, err = exec.LookPath("prlctl")
 		if err != nil {
-			return err
+			return stdout.String(), err
 		}
 	}
 
@@ -35,17 +35,17 @@ func Prlctl(args ...string) error {
 	log.Printf("stdout: %s", stdoutString)
 	log.Printf("stderr: %s", stderrString)
 
-	return err
+	return stdoutString, err
 }
 
-func Vzctl(args ...string) error {
+func Vzctl(args ...string) (string, error) {
 	var stdout, stderr bytes.Buffer
 	var prlctlPath string
 	if prlctlPath == "" {
 		var err error
 		prlctlPath, err = exec.LookPath("vzctl")
 		if err != nil {
-			return err
+			return stdout.String(), err
 		}
 	}
 
@@ -65,5 +65,5 @@ func Vzctl(args ...string) error {
 	log.Printf("stdout: %s", stdoutString)
 	log.Printf("stderr: %s", stderrString)
 
-	return err
+	return stdoutString, err
 }

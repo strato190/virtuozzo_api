@@ -7,44 +7,46 @@ import (
 
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/mux"
 )
 
 // curl 127.0.0.1:3000/products -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTAzOTkyMTI3LCJuYW1lIjoiQWRvIEt1a2ljIn0.ubLiFVBoFQWZjyynO09oKO7wVhklC-yanXTxBUbkTt8"
 
-// get vms list
-var VmHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	payload, _ := json.Marshal(products)
+//VMHandler get vms list
+var VMHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	hostedVms, _ := getVMS()
+
+	payload, _ := json.Marshal(hostedVms)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(payload))
 })
 
 //add vm
-var VmAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	var product Product
-	vars := mux.Vars(r)
-	slug := vars["slug"]
-
-	for _, p := range products {
-		if p.Slug == slug {
-			product = p
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if product.Slug != "" {
-		payload, _ := json.Marshal(product)
-		w.Write([]byte(payload))
-	} else {
-		w.Write([]byte("Product Not Found"))
-	}
-})
+//var VmAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//	var product Product
+//	vars := mux.Vars(r)
+//	slug := vars["slug"]
+//
+//	for _, p := range products {
+//		if p.Slug == slug {
+//			product = p
+//		}
+//	}
+//
+//	w.Header().Set("Content-Type", "application/json")
+//	if product.Slug != "" {
+//		payload, _ := json.Marshal(product)
+//		w.Write([]byte(payload))
+//	} else {
+//		w.Write([]byte("Product Not Found"))
+//	}
+//})
 
 //get token
 
 var mySigningKey = []byte("secret")
 
+//GetTokenHandler gets token for user
 var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	/* Create the token */
 	token := jwt.New(jwt.SigningMethodHS256)

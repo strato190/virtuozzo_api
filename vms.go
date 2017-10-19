@@ -1,14 +1,29 @@
 package main
 
-func config_vm_network(v VM) error {
+func getVMS() (string, error) {
+	var v string
+	var err error
+	commands := make([][]string, 1)
+	commands[0] = []string{"list", "--vmtype", "vm", "-o", "name", "-H"}
+	for _, command := range commands {
+		v, err = Prlctl(command...)
+		if err != nil {
+			return v, err
+		}
+	}
+	return v, nil
+
+}
+
+func configVMNetwork(v VM) error {
 	commands := make([][]string, 0)
 	vmName := v.Name
 	for _, n := range v.Networks {
 		if n.Device != "" {
 			commands = append(commands, []string{"set", vmName, "--device-set", n.Device})
 		}
-		if n.Ip != "" {
-			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--ipadd", n.Ip})
+		if n.IP != "" {
+			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--ipadd", n.IP})
 		}
 		if n.Gateway != "" {
 			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--gw", n.Gateway})
@@ -18,7 +33,7 @@ func config_vm_network(v VM) error {
 		}
 	}
 	for _, command := range commands {
-		err := Prlctl(command...)
+		_, err := Prlctl(command...)
 		if err != nil {
 			return err
 		}
@@ -26,12 +41,12 @@ func config_vm_network(v VM) error {
 	return nil
 }
 
-func create_vm(v VM) error {
+func createVM(v VM) error {
 	vmName := v.Name
 
 	command := []string{"create", vmName, "--ostemplate", "vm-template-centos7"}
 
-	err := Prlctl(command...)
+	_, err := Prlctl(command...)
 
 	if err != nil {
 		return err
@@ -40,16 +55,16 @@ func create_vm(v VM) error {
 
 }
 
-func config_vm(v VM) error {
+func configVM(v VM) error {
 	vmName := v.Name
 	commands := make([][]string, 4)
 	commands[0] = []string{"set", vmName, "--cpus", v.CPU}
-	commands[1] = []string{"set", vmName, "--memsize", v.Ram}
+	commands[1] = []string{"set", vmName, "--memsize", v.RAM}
 	commands[2] = []string{"set", vmName, "--autostart", v.Astart}
 	commands[3] = []string{"set", vmName, "--hostname", vmName}
 
 	for _, command := range commands {
-		err := Prlctl(command...)
+		_, err := Prlctl(command...)
 		if err != nil {
 			return err
 		}
@@ -58,15 +73,15 @@ func config_vm(v VM) error {
 
 }
 
-func config_network(v VM) error {
+func configNetwork(v VM) error {
 	commands := make([][]string, 0)
 	vmName := v.Name
 	for _, n := range v.Networks {
 		if n.Device != "" {
 			commands = append(commands, []string{"set", vmName, "--device-set", n.Device})
 		}
-		if n.Ip != "" {
-			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--ipadd", n.Ip})
+		if n.IP != "" {
+			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--ipadd", n.IP})
 		}
 		if n.Gateway != "" {
 			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--gw", n.Gateway})
@@ -76,7 +91,7 @@ func config_network(v VM) error {
 		}
 	}
 	for _, command := range commands {
-		err := Prlctl(command...)
+		_, err := Prlctl(command...)
 		if err != nil {
 			return err
 		}
