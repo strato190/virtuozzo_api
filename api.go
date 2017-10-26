@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
-
+  "strings"
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -15,7 +15,7 @@ import (
 var VMHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	hostedVms, _ := getVMS()
 
-	payload, _ := json.Marshal(hostedVms)
+	payload, _ := json.Marshal(strings.Split(hostedVms, "\n"))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(payload))
