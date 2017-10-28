@@ -20,6 +20,9 @@ func configVMNetwork(v VM) error {
 	vmName := v.Name
 	for _, n := range v.Networks {
 		if n.Device != "" {
+			if n.Device != "net0" {
+				commands = append(commands, []string{"set", vmName, "--device-add", "net"})
+			}
 			commands = append(commands, []string{"set", vmName, "--device-set", n.Device})
 		}
 		if n.IP != "" {
@@ -43,8 +46,9 @@ func configVMNetwork(v VM) error {
 
 func createVM(v VM) error {
 	vmName := v.Name
+	vmTemplate := v.Template
 
-	command := []string{"create", vmName, "--ostemplate", "vm-template-centos7"}
+	command := []string{"create", vmName, "--ostemplate", vmTemplate}
 
 	_, err := Prlctl(command...)
 
@@ -71,30 +75,4 @@ func configVM(v VM) error {
 	}
 	return nil
 
-}
-
-func configNetwork(v VM) error {
-	commands := make([][]string, 0)
-	vmName := v.Name
-	for _, n := range v.Networks {
-		if n.Device != "" {
-			commands = append(commands, []string{"set", vmName, "--device-set", n.Device})
-		}
-		if n.IP != "" {
-			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--ipadd", n.IP})
-		}
-		if n.Gateway != "" {
-			commands = append(commands, []string{"set", vmName, "--device-set", n.Device, "--gw", n.Gateway})
-		}
-		if n.Nameserver != "" {
-			commands = append(commands, []string{"set", vmName, "--nameserver", n.Nameserver})
-		}
-	}
-	for _, command := range commands {
-		_, err := Prlctl(command...)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }

@@ -41,7 +41,7 @@ func main() {
 		for _, v := range intf.Vms {
 			//err = create_vm(v)
 			err = configVM(v)
-			err = configNetwork(v)
+			err = configVMNetwork(v)
 			if err != nil {
 				log.Fatal(err)
 			}

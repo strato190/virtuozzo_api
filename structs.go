@@ -18,6 +18,7 @@ type VM struct {
 	Astart   string `json:"autostart"`
 	RAM      string `json:"memory"`
 	CPU      string `json:"cpu"`
+  Template string `json:"template"`
 	Networks []Nets `json:"net,omitempty"`
 }
 
@@ -28,6 +29,7 @@ type CT struct {
 	Astart   string `json:"autostart"`
 	RAM      string `json:"memory"`
 	CPU      string `json:"cpu"`
+  Template string `json:"template"`
 	Networks []Nets `json:"net,omitempty"`
 }
 
