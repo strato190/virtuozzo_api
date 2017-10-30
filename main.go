@@ -22,7 +22,7 @@ func main() {
 
 	r.Handle("/vms", jwtMiddleware.Handler(VMHandler)).Methods("GET")
 	r.Handle("/get-token", GetTokenHandler).Methods("GET")
-	//	r.Handle("/vms", jwtMiddleware.Handler(VmAddHandler)).Methods("POST")
+	r.Handle("/vms", jwtMiddleware.Handler(VmAddHandler)).Methods("POST")
 
 	http.ListenAndServe(":3000", handlers.LoggingHandler(os.Stdout, r))
 

@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"strings"
 	"time"
-  "strings"
+
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -22,25 +25,39 @@ var VMHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 })
 
 //add vm
-//var VmAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//	var product Product
-//	vars := mux.Vars(r)
-//	slug := vars["slug"]
-//
-//	for _, p := range products {
-//		if p.Slug == slug {
-//			product = p
-//		}
-//	}
-//
-//	w.Header().Set("Content-Type", "application/json")
-//	if product.Slug != "" {
-//		payload, _ := json.Marshal(product)
-//		w.Write([]byte(payload))
-//	} else {
-//		w.Write([]byte("Product Not Found"))
-//	}
-//})
+var VmAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	var intf Instances
+	var err error
+	//	var product Product
+	//	vars := mux.Vars(r)
+	//	slug := vars["slug"]
+	//
+	//	for _, p := range products {
+	//		if p.Slug == slug {
+	//			product = p
+	//		}
+	//	}
+	//
+	jsn, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(jsn, &intf)
+	for _, v := range intf.Vms {
+		err = createVM(v)
+		err = configVM(v)
+		err = configVMNetwork(v)
+		if err != nil {
+			log.Fatal(err)
+			payload, _ := json.Marshal(err)
+			w.Write([]byte(payload))
+		}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	//	if product.Slug != "" {
+	//		payload, _ := json.Marshal(product)
+	//		w.Write([]byte(payload))
+	//	} else {
+	//		w.Write([]byte("Product Not Found"))
+	//	}
+})
 
 //get token
 
