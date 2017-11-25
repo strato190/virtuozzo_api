@@ -17,7 +17,7 @@ func getCTS() (string, error) {
 
 func createCT(c CT) error {
 	cName := c.Name
-  cTemplate := c.Template
+	cTemplate := c.Template
 	command := []string{"create", cName, "--ostemplate", cTemplate}
 	_, err := Vzctl(command...)
 	if err != nil {
@@ -27,12 +27,21 @@ func createCT(c CT) error {
 }
 
 func configCT(c CT) error {
+	var diskSize string
+
 	cName := c.Name
-	commands := make([][]string, 4)
+	commands := make([][]string, 5)
+
+	if c.DISK == "" {
+		diskSize = "10G"
+	} else {
+		diskSize = c.DISK
+	}
 	commands[0] = []string{"set", cName, "--cpus", c.CPU}
 	commands[1] = []string{"set", cName, "--memsize", c.RAM}
 	commands[2] = []string{"set", cName, "--autostart", c.Astart}
 	commands[3] = []string{"set", cName, "--hostname", cName}
+	commands[4] = []string{"set", cName, "--device-set hdd0", "--size", diskSize}
 
 	for _, command := range commands {
 		_, err := Vzctl(command...)

@@ -29,6 +29,7 @@ type CT struct {
 	State    string `json:"state"`
 	Astart   string `json:"autostart"`
 	RAM      string `json:"memory"`
+	DISK     string `json:"disk"`
 	CPU      string `json:"cpu"`
 	Template string `json:"template"`
 	Networks []Nets `json:"net,omitempty"`
