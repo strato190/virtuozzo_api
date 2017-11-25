@@ -6,6 +6,8 @@
       "memory": "1024",
       "cpu": "1",
       "autostart": "on",
+      "disk": "7G",
+      "template": "vm-template-centos7",
       "net": [
             {
                     "device": "net0",

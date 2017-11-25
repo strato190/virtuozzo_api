@@ -17,7 +17,8 @@ func getCTS() (string, error) {
 
 func createCT(c CT) error {
 	cName := c.Name
-	command := []string{"create", cName, "--ostemplate", "vm-template-centos7"}
+  cTemplate := c.Template
+	command := []string{"create", cName, "--ostemplate", cTemplate}
 	_, err := Vzctl(command...)
 	if err != nil {
 		return err

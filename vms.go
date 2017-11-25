@@ -1,6 +1,11 @@
 package main
 
-func getVMS() (string, error) {
+import (
+	"encoding/json"
+	"strings"
+)
+
+func getVMS() ([]byte, error) {
 	var v string
 	var err error
 	commands := make([][]string, 1)
@@ -8,10 +13,11 @@ func getVMS() (string, error) {
 	for _, command := range commands {
 		v, err = Prlctl(command...)
 		if err != nil {
-			return v, err
+			return []byte(v), err
 		}
 	}
-	return v, nil
+	jsnout, _ := json.Marshal(strings.Split(v, "\n"))
+	return jsnout, nil
 
 }
 
@@ -59,13 +65,66 @@ func createVM(v VM) error {
 
 }
 
-func configVM(v VM) error {
+func startVM(v VM) error {
 	vmName := v.Name
-	commands := make([][]string, 4)
+
+	command := []string{"start", vmName}
+
+	_, err := Prlctl(command...)
+
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func stopVM(v VM) error {
+	vmName := v.Name
+
+	command := []string{"start", vmName}
+
+	_, err := Prlctl(command...)
+
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func destroyVM(v VM) error {
+	vmName := v.Name
+
+	if err := stopVM(v); err != nil {
+		return err
+	}
+
+	command := []string{"destroy", vmName}
+
+	_, err := Prlctl(command...)
+
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func configVM(v VM) error {
+	var diskSize string
+	vmName := v.Name
+	commands := make([][]string, 5)
+	if v.DISK == "" {
+		diskSize = "10G"
+	} else {
+		diskSize = v.DISK
+	}
 	commands[0] = []string{"set", vmName, "--cpus", v.CPU}
 	commands[1] = []string{"set", vmName, "--memsize", v.RAM}
 	commands[2] = []string{"set", vmName, "--autostart", v.Astart}
 	commands[3] = []string{"set", vmName, "--hostname", vmName}
+	commands[4] = []string{"set", vmName, "--device-set hdd0", "--size", diskSize}
 
 	for _, command := range commands {
 		_, err := Prlctl(command...)

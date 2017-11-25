@@ -13,16 +13,17 @@ import (
 
 func main() {
 	var intf Instances
-	var err error
+	//var err error
 
 	r := mux.NewRouter()
 
 	//r.Handle("/", http.FileServer(http.Dir("./views/")))
 	//r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
+	//r.Handle("/", jwtMiddleware.Handler(VMHandler)).Methods("GET")
 	r.Handle("/vms", jwtMiddleware.Handler(VMHandler)).Methods("GET")
 	r.Handle("/get-token", GetTokenHandler).Methods("GET")
-	r.Handle("/vms", jwtMiddleware.Handler(VmAddHandler)).Methods("POST")
+	r.Handle("/vms", jwtMiddleware.Handler(VMAddHandler)).Methods("POST")
 
 	http.ListenAndServe(":3000", handlers.LoggingHandler(os.Stdout, r))
 
@@ -30,19 +31,28 @@ func main() {
 	json.Unmarshal(jsn, &intf)
 	if len(intf.Cts) > 0 {
 		for _, c := range intf.Cts {
-			err = createCT(c)
-			err = configCT(c)
-			if err != nil {
+			if err := createCT(c); err != nil {
 				log.Fatal(err)
 			}
+			//err = configVMNetwork(v)
+			if err := configCT(c); err != nil {
+				log.Fatal(err)
+			}
+			//err = createCT(c)
+			//err = configCT(c)
+
 		}
 	}
 	if len(intf.Vms) > 0 {
 		for _, v := range intf.Vms {
-			//err = create_vm(v)
-			err = configVM(v)
-			err = configVMNetwork(v)
-			if err != nil {
+
+			if err := createVM(v); err != nil {
+				log.Fatal(err)
+			}
+			if err := configVM(v); err != nil {
+				log.Fatal(err)
+			}
+			if err := configVMNetwork(v); err != nil {
 				log.Fatal(err)
 			}
 		}

@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/auth0/go-jwt-middleware"
@@ -14,41 +13,41 @@ import (
 
 // curl 127.0.0.1:3000/products -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTAzOTkyMTI3LCJuYW1lIjoiQWRvIEt1a2ljIn0.ubLiFVBoFQWZjyynO09oKO7wVhklC-yanXTxBUbkTt8"
 
+//var VMDefaultHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request)) {
+//
+//}
+
 //VMHandler get vms list
 var VMHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	hostedVms, _ := getVMS()
-
-	payload, _ := json.Marshal(strings.Split(hostedVms, "\n"))
-
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(payload))
+	w.Write([]byte(hostedVms))
 })
 
-//add vm
-var VmAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//VMAddHandler add's vm to the host
+var VMAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	var intf Instances
-	var err error
-	//	var product Product
-	//	vars := mux.Vars(r)
-	//	slug := vars["slug"]
-	//
-	//	for _, p := range products {
-	//		if p.Slug == slug {
-	//			product = p
-	//		}
-	//	}
-	//
+
 	jsn, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(jsn, &intf)
 	for _, v := range intf.Vms {
-		err = createVM(v)
-		err = configVM(v)
-		err = configVMNetwork(v)
-		if err != nil {
+
+		if err := createVM(v); err != nil {
 			log.Fatal(err)
 			payload, _ := json.Marshal(err)
 			w.Write([]byte(payload))
 		}
+		if err := configVM(v); err != nil {
+			log.Fatal(err)
+			payload, _ := json.Marshal(err)
+			w.Write([]byte(payload))
+		}
+		if err := configVMNetwork(v); err != nil {
+			log.Fatal(err)
+			payload, _ := json.Marshal(err)
+			w.Write([]byte(payload))
+		}
+
 	}
 	w.Header().Set("Content-Type", "application/json")
 	//	if product.Slug != "" {
