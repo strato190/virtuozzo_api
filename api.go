@@ -11,12 +11,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// curl 127.0.0.1:3000/products -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTAzOTkyMTI3LCJuYW1lIjoiQWRvIEt1a2ljIn0.ubLiFVBoFQWZjyynO09oKO7wVhklC-yanXTxBUbkTt8"
-
-//var VMDefaultHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request)) {
-//
-//}
-
 //VMHandler get vms list
 var VMHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	hostedVms, _ := getVMS()
@@ -50,36 +44,36 @@ var VMAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request)
 
 	}
 	w.Header().Set("Content-Type", "application/json")
-	//	if product.Slug != "" {
-	//		payload, _ := json.Marshal(product)
-	//		w.Write([]byte(payload))
-	//	} else {
-	//		w.Write([]byte("Product Not Found"))
-	//	}
+
 })
 
 //get token
 
-var mySigningKey = []byte("secret")
+var mySigningKey = []byte("SuperSecretKey")
 
 //GetTokenHandler gets token for user
 var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	/* Create the token */
-	token := jwt.New(jwt.SigningMethodHS256)
+	if checkAuth(w, r) {
+		/* Create the token */
+		token := jwt.New(jwt.SigningMethodHS256)
 
-	/* Create a map to store our claims */
-	claims := token.Claims.(jwt.MapClaims)
+		/* Create a map to store our claims */
+		claims := token.Claims.(jwt.MapClaims)
 
-	/* Set token claims */
-	claims["admin"] = true
-	claims["name"] = "Ado Kukic"
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+		/* Set token claims */
+		claims["admin"] = true
+		claims["name"] = "Ado Kukic"
+		claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
-	/* Sign the token with our secret */
-	tokenString, _ := token.SignedString(mySigningKey)
+		/* Sign the token with our secret */
+		tokenString, _ := token.SignedString(mySigningKey)
 
-	/* Finally, write the token to the browser window */
-	w.Write([]byte(tokenString))
+		/* Finally, write the token to the browser window */
+		w.Write([]byte(tokenString))
+	} else {
+		w.WriteHeader(401)
+		w.Write([]byte("401 Unauthorized\n"))
+	}
 })
 
 var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
