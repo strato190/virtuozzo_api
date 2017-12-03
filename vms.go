@@ -9,7 +9,7 @@ func getVMS() ([]byte, error) {
 	var v string
 	var err error
 	commands := make([][]string, 1)
-	commands[0] = []string{"list", "--vmtype", "vm", "-o", "name", "-H"}
+	commands[0] = []string{"list", "--vmtype", "vm", "-o", "name", "-Ha"}
 	for _, command := range commands {
 		v, err = Prlctl(command...)
 		if err != nil {
@@ -18,6 +18,44 @@ func getVMS() ([]byte, error) {
 	}
 	jsnout, _ := json.Marshal(strings.Split(v, "\n"))
 	return jsnout, nil
+
+}
+
+func checkVM(v VM, status string) (bool, error) {
+	var err error
+	vmName := v.Name
+	stdout := ""
+
+	commands := make([][]string, 0)
+
+	commands[0] = []string{"list", vmName, "--no-header", "--output", "status"}
+
+	for _, command := range commands {
+		stdout, err = Prlctl(command...)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	for _, line := range strings.Split(stdout, "\n") {
+		if line == "running" && (status == "exist" || status == "started") {
+			return true, nil
+		}
+
+		if status == "exist" {
+			if line == "suspended" {
+				return true, nil
+			}
+			if line == "paused" {
+				return true, nil
+			}
+			if line == "stopping" {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
 
 }
 
@@ -124,7 +162,7 @@ func configVM(v VM) error {
 	commands[1] = []string{"set", vmName, "--memsize", v.RAM}
 	commands[2] = []string{"set", vmName, "--autostart", v.Astart}
 	commands[3] = []string{"set", vmName, "--hostname", vmName}
-	commands[4] = []string{"set", vmName, "--device-set hdd0", "--size", diskSize}
+	commands[4] = []string{"set", vmName, "--device-set", "hdd0", "--size", diskSize}
 
 	for _, command := range commands {
 		_, err := Prlctl(command...)
