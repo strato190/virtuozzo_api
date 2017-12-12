@@ -1,17 +1,23 @@
 package main
 
-func getCTS() (string, error) {
+import (
+	"encoding/json"
+	"strings"
+)
+
+func getCTS() ([]byte, error) {
 	var v string
 	var err error
 	commands := make([][]string, 1)
-	commands[0] = []string{"list", "--vmtype", "ct", "-o", "name", "-H"}
+	commands[0] = []string{"list", "--vmtype", "ct", "-o", "name", "-Ha"}
 	for _, command := range commands {
-		v, err = Vzctl(command...)
+		v, err = Prlctl(command...)
 		if err != nil {
-			return v, err
+			return []byte(v), err
 		}
 	}
-	return v, nil
+	jsnout, _ := json.Marshal(strings.Split(v, "\n"))
+	return jsnout, nil
 
 }
 

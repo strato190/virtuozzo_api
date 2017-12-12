@@ -18,6 +18,13 @@ var VMHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(hostedVms))
 })
 
+//CTHandler get vms list
+var CTHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	hostedCts, _ := getCTS()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(hostedCts))
+})
+
 //VMAddHandler add's vm to the host
 var VMAddHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	var intf Instances

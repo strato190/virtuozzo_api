@@ -19,7 +19,7 @@ func main() {
 	r.Handle("/vms", jwtMiddleware.Handler(VMHandler)).Methods("GET")
 	r.Handle("/get-token", GetTokenHandler).Methods("GET")
 	r.Handle("/vms", jwtMiddleware.Handler(VMAddHandler)).Methods("POST")
-	//r.Handle("/cts", jwtMiddleware.Handler(CTHandler)).Methods("GET")
+	r.Handle("/cts", jwtMiddleware.Handler(CTHandler)).Methods("GET")
 	//r.Handle("/cts", jwtMiddleware.Handler(CTAddHandler)).Methods("POST")
 
 	http.ListenAndServe(":3000", handlers.LoggingHandler(os.Stdout, r))
